@@ -23,7 +23,7 @@ import Foundation
 // This value is automatically updated by 'make bump'.
 // The version number is used to find the correct shared library file.
 // We currently only support binding to an exact version of libyamlstar.
-public let yamlstarVersion = "0.1.17"
+public let yamlstarVersion = "0.1.18"
 
 #if os(Linux)
     let libyamlstarName = "libyamlstar.so.\(yamlstarVersion)"
@@ -170,6 +170,9 @@ public final class YAMLStar {
             FileHandle.standardError.write(
                 Data("Failed to tear down isolate\n".utf8))
         }
-        dlclose(handle)
+
+        // A Go c-shared runtime cannot be safely unloaded on macOS. Keep the
+        // process-wide library loaded and let the operating system reclaim it
+        // when the process exits.
     }
 }
